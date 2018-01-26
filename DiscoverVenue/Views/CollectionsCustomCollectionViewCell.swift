@@ -16,6 +16,8 @@ class CollectionsCustomCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "placeholder")
         imageView.contentMode = .scaleAspectFit
+        imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .clear
         return imageView
     }()
     
@@ -66,6 +68,7 @@ class CollectionsCustomCollectionViewCell: UICollectionViewCell {
     
     private func commonInit() {
         setupViews()
+        
     }
     
     private func setupViews() {
@@ -74,6 +77,7 @@ class CollectionsCustomCollectionViewCell: UICollectionViewCell {
         addSubview(spinner)
         addSubview(plusSignImageView)
         setupVenueImageView()
+        
     }
     
     private func setupVenueImageView() {
@@ -82,7 +86,7 @@ class CollectionsCustomCollectionViewCell: UICollectionViewCell {
             make.top.equalTo(self.snp.top)
             make.leading.equalTo(self.snp.leading)
             make.trailing.equalTo(self.snp.trailing)
-            make.height.equalTo(self.snp.height).multipliedBy(0.85)
+            make.height.equalTo(self.snp.height)
         }
         
         collectionNameLabel.snp.makeConstraints { (make) -> Void in

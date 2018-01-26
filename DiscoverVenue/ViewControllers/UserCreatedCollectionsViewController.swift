@@ -8,29 +8,42 @@
 
 import UIKit
 
+
+
 class UserCreatedCollectionsViewController: UIViewController {
     
-    let userCreatedCollectionsView = UserCreatedCollectionsView()
-    let cellSpacing: CGFloat =  5.0
     
-    var sampleTestArray = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    
+    private let userCreatedCollectionsView = UserCreatedCollectionsView()
+    private let cellSpacing: CGFloat =  5.0
+    
+    private var venuesCollectionArray = [VenuesCollections]() {
+        didSet {
+            userCreatedCollectionsView.collectionView.reloadData()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpView()
+        addCollectionVC.refreshDelegate = self
+        //venuesCollectionArray =  FileManagerHelper.manager.getVenuesCollectionsArr()
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setUpView()
+        venuesCollectionArray =  FileManagerHelper.manager.getVenuesCollectionsArr()
+        userCreatedCollectionsView.collectionView.reloadData()
     }
     
-    func setUpView() {
-        view.backgroundColor = .purple
+    private func setUpView() {
         navigationItem.title = "My Collections"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteAll))
         
         //Add Initial View
         view.addSubview(userCreatedCollectionsView)
@@ -41,12 +54,12 @@ class UserCreatedCollectionsViewController: UIViewController {
     }
     
     
+    private let addCollectionVC = AddCollectionViewController()
     
-    @objc func addTapped() {
+    @objc private func addTapped() {
         // Present AddCollectionViewController
         print("Present AddCollectionViewController")
         
-        let addCollectionVC = AddCollectionViewController()
         
         let addCollectionViewWithNavController = UINavigationController(rootViewController: addCollectionVC)
         
@@ -59,6 +72,18 @@ class UserCreatedCollectionsViewController: UIViewController {
         
     }
     
+    @objc private func deleteAll() {
+        let alert = UIAlertController(title: "Delete All?", message: "Press 'Yes' to erase Saved Venues", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (UIAlertAction) in
+            FileManagerHelper.manager.eraseSaves()
+            self.viewRemovedRefreshNowPlease() // This calls from File Manager and THEN refreshes the view
+        }))
+        alert.addAction(UIAlertAction(title: "Nope", style: .default, handler: { (UIAlertAction) in
+            self.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     
     
 }
@@ -68,38 +93,65 @@ extension UserCreatedCollectionsViewController: UICollectionViewDelegate {
         
         print("The Collection View for IndexPath: \(indexPath.row) should pop up now")
         
-         // identify a specific collection
-         //let aSpecificCollection = UserCollections[indexPath.row]
-         
-         // using dependency injection to pass Data Object into Venue Collection View Controller
-         let modalSavedVenuesVC = ModalSavedVenuesViewController()
+        // identify a specific collection
+        let aSpecificCollection = venuesCollectionArray[indexPath.row]
+        
+        // using dependency injection to pass Data Object into Venue Collection View Controller
+        let modalSavedVenuesVC = ModalSavedVenuesViewController()
+        
         
         let mSVVCinNavCon = UINavigationController(rootViewController: modalSavedVenuesVC)
-         
-         modalSavedVenuesVC.modalTransitionStyle = .crossDissolve
-         modalSavedVenuesVC.modalPresentationStyle = .overCurrentContext
-         present(mSVVCinNavCon, animated: true, completion: nil)
-         
-         //func to configure view on VC
-        modalSavedVenuesVC.configureSavedVenueVC(testArray: sampleTestArray)
+        //func to configure view on VC
+        modalSavedVenuesVC.configureSavedVenueVC(aSpecificCollection: aSpecificCollection)
+        
+        modalSavedVenuesVC.modalTransitionStyle = .coverVertical
+        modalSavedVenuesVC.modalPresentationStyle = .overCurrentContext
+        present(mSVVCinNavCon, animated: true, completion: nil)
+        
         
     }
     
 }
 extension UserCreatedCollectionsViewController: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        var numOfSections: Int = 0
+        if venuesCollectionArray.count > 0 {
+            userCreatedCollectionsView.collectionView.backgroundView = nil
+            numOfSections = 1
+        } else {
+            let noDataLabel: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: userCreatedCollectionsView.collectionView.bounds.size.width, height: userCreatedCollectionsView.collectionView.bounds.size.height))
+            noDataLabel.text = "No Collections Yet"
+            noDataLabel.font = UIFont.systemFont(ofSize: 22, weight: .medium)
+            noDataLabel.textAlignment = .center
+            userCreatedCollectionsView.collectionView.backgroundView = noDataLabel
+        }
+        return numOfSections
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 5
+        return venuesCollectionArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionsCustomCollectionViewCell", for: indexPath) as! CollectionsCustomCollectionViewCell
         
+        let aCollection = venuesCollectionArray[indexPath.row]
+        
         //cell.spinner.isHidden = false
         //cell.spinner.startAnimating()
-        cell.collectionImageView.image = #imageLiteral(resourceName: "placeholder")
-        cell.collectionNameLabel.text = "IndexPath : \(indexPath.row)"
+        cell.collectionImageView.image = #imageLiteral(resourceName: "placeholder") //Placeholder
+        
+        if let latestVenue = aCollection.savedVenues.last {
+            cell.collectionImageView.image = FileManagerHelper.manager.getImage(with: latestVenue.id)
+        } else {
+            cell.collectionImageView.image = #imageLiteral(resourceName: "placeholder") //Placeholder
+        }
+        
+        cell.collectionNameLabel.text = aCollection.collectionName
+        
         
         
         return cell
@@ -129,6 +181,14 @@ extension UserCreatedCollectionsViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return cellSpacing
     }
+}
+extension UserCreatedCollectionsViewController: RefreshFromModalSaveDelegate {
+    func viewRemovedRefreshNowPlease() {
+        venuesCollectionArray =  FileManagerHelper.manager.getVenuesCollectionsArr()
+        userCreatedCollectionsView.collectionView.reloadData()
+    }
+    
+    
 }
 
 

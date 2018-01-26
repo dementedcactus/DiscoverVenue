@@ -19,7 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         let tabBarController = UITabBarController()
-        let mapViewController = MapViewController()
+        
+        let venueAPIclient = VenueAPIClient()
+        let mapViewController = MapViewController(venueAPIclient: venueAPIclient)
+        
         let mapViewNavCon = UINavigationController(rootViewController: mapViewController)
         mapViewController.tabBarItem = UITabBarItem(title: "Search", image: #imageLiteral(resourceName: "search"), tag: 0)
         let userCreatedCollectionsVC = UserCreatedCollectionsViewController()
@@ -28,6 +31,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBarController.viewControllers = [mapViewNavCon, userCreatedCollectionsNavCon]
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
+        FileManagerHelper.manager.loadFromDisk()
+        
+        //  This will change the color of the navigationBar when called in the viewDidLoad of any ViewController
+        //UINavigationBar.appearance().barTintColor = UIColor(red: 0, green: 0/255, blue: 205/255, alpha: 1)
+        //UINavigationBar.appearance().tintColor = UIColor.white
+        //UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
         
         return true
     }
