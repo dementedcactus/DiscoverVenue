@@ -1,9 +1,10 @@
 //
 //  SearchResultsTableView.swift
-//
+//  
 //
 //  Created by Caroline Cruz on 1/22/18.
 //
+
 import UIKit
 import SnapKit
 
@@ -13,7 +14,7 @@ class SearchResultsTableView: UIView {
     lazy var tableView: UITableView = {
         let tv = UITableView()
         tv.register(VenueTableViewCell.self, forCellReuseIdentifier: "VenueCell")
-        tv.backgroundColor = UIColor.groupTableViewBackground
+        tv.backgroundColor = .orange
         return tv
     }()
     
@@ -28,7 +29,7 @@ class SearchResultsTableView: UIView {
     }
     
     private func commonInit() {
-        //backgroundColor = .black
+        backgroundColor = .black
         setupViews()
     }
     
@@ -46,3 +47,5 @@ class SearchResultsTableView: UIView {
         }
     }
 }
+
+

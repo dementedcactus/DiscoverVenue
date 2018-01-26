@@ -5,6 +5,7 @@
 //  Created by Caroline Cruz on 1/22/18.
 //  Copyright © 2018 Luis Calle. All rights reserved.
 //
+
 import UIKit
 import GameplayKit
 
@@ -17,16 +18,10 @@ class SearchResultsTableViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .yellow
         view.addSubview(venueView)
-        configureNavBar()
+        
         //        setup delegate and datasource
         venueView.tableView.dataSource = self
         venueView.tableView.delegate = self
-    }
-    
-    private func configureNavBar() {
-        navigationItem.title = "Results"
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
     }
 }
 
@@ -41,7 +36,7 @@ extension SearchResultsTableViewController: UITableViewDataSource {
         //            let venue = venues[indexPath.row]
         //            cell.congfigureCell(venue: venue)
         cell.nameLabel.text = "Hello"
-        cell.venueImageView.image = #imageLiteral(resourceName: "placeholderImage")
+        cell.venueImageView.image = #imageLiteral(resourceName: "placeholder")
         return cell
     }
 }
@@ -60,23 +55,15 @@ extension SearchResultsTableViewController: UITableViewDelegate {
         cell.nameLabel.text = "Hello"
         cell.ratingLabel.text = "Good"
         
-//        let dvc = SearchResultDetailViewController()//(venue: venue, image: cellImage )
-//        //        the way the modal comes on the screen
-//        dvc.modalTransitionStyle = .crossDissolve
-//        dvc.modalPresentationStyle = .overCurrentContext
-//        present(dvc, animated: true, completion: nil)
-        
-//        let SRDVC = SearchResultDetailViewController()
-//        //create nav controller as its root
-//        let navController = UINavigationController(rootViewController:SRDVC)
-//        SRDVC.modalTransitionStyle = .crossDissolve
-//        SRDVC.modalPresentationStyle = .currentContext
-        let SRDVC = SearchResultDetailViewController()
-        self.navigationController?.pushViewController(SRDVC, animated: true)
-        
+        let dvc = SearchResultsDetailViewController()//(venue: venue, image: cellImage )
+        //        the way the modal comes on the screen
+        dvc.modalTransitionStyle = .crossDissolve
+        dvc.modalPresentationStyle = .overCurrentContext
+        present(dvc, animated: true, completion: nil)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 160.0
     }
 }
+

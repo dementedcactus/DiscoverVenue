@@ -1,9 +1,9 @@
 //
 //  UserCreatedCollectionsView.swift
-//  DiscoverVenue
+//  DiscoverAVenue
 //
-//  Created by Luis Calle on 1/19/18.
-//  Copyright © 2018 Luis Calle. All rights reserved.
+//  Created by Richard Crichlow on 1/18/18.
+//  Copyright © 2018 Caroline Cruz. All rights reserved.
 //
 
 import UIKit
@@ -15,7 +15,8 @@ class UserCreatedCollectionsView: UIView {
         let layout = UICollectionViewFlowLayout()
         let cv = UICollectionView(frame: frame, collectionViewLayout: layout)
         layout.scrollDirection = .vertical
-        cv.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.00)
+        //cv.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.00)
+        cv.backgroundColor = UIColor.groupTableViewBackground
         
         // Register CollectionViewCell
         cv.register(CollectionsCustomCollectionViewCell.self, forCellWithReuseIdentifier: "CollectionsCustomCollectionViewCell")
@@ -33,8 +34,7 @@ class UserCreatedCollectionsView: UIView {
     }
     
     private func commonInit() {
-        backgroundColor = .purple
-        
+        backgroundColor = UIColor.groupTableViewBackground
         setupViews()
     }
     
@@ -48,3 +48,4 @@ class UserCreatedCollectionsView: UIView {
     
     
 }
+
